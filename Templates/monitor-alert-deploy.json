@@ -82,6 +82,13 @@
     "autoMitigate": {
       "type": "bool",
       "defaultValue": false
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {},
@@ -90,6 +97,7 @@
       "type": "microsoft.insights/scheduledqueryrules",
       "apiVersion": "2021-02-01-preview",
       "name": "[parameters('name')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "properties": {
         "enabled": true,

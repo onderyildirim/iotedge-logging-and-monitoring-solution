@@ -205,6 +205,11 @@ function New-IoTEnvironment() {
 
     #endregion
 
+
+    $github_repo_url = $(git config --get remote.origin.url)
+    $github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
+    $github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+    
     $platform_parameters = @{
         "location"                    = @{ "value" = $location }
         "edgeVmName"                  = @{ "value" = $edge_vm_name }
@@ -214,8 +219,9 @@ function New-IoTEnvironment() {
         "edgeSubnetId"                = @{ "value" = $edge_subnet_id }
         "dpsIdScope"                  = @{ "value" = $dps_id_scope }
         "dpsConnectionString"         = @{ "value" = $dps_conn_string }
-        "templateUrl"                 = @{ "value" = "https://raw.githubusercontent.com/Azure-Samples/iotedge-logging-and-monitoring-solution" }
+        "templateUrl"                 = @{ "value" = $github_repo_url }
         "branchName"                  = @{ "value" = $(git rev-parse --abbrev-ref HEAD) }
+        "customTags"                              = @{ "value" = $script:custom_tags }
     }
     Set-Content -Path "$($root_path)/Templates/iotedge-vm-deploy.parameters.json" -Value (ConvertTo-Json $platform_parameters -Depth 5)
 

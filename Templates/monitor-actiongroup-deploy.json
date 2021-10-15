@@ -25,6 +25,13 @@
     "useCommonAlertSchema": {
       "type": "bool",
       "defaultValue": true
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {},
@@ -33,6 +40,7 @@
       "type": "microsoft.insights/actionGroups",
       "apiVersion": "2019-06-01",
       "name": "[parameters('name')]",
+      "tags": "[parameters('customTags')]",
       "location": "Global",
       "properties": {
         "groupShortName": "[parameters('shortName')]",

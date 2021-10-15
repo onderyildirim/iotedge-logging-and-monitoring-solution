@@ -92,7 +92,14 @@
             "metadata": {
                 "description": "Event hubs send policy name."
             }
-        }
+        },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
+    }
     },
     "variables": {
         "NamespaceId": "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaceName'))]",
@@ -109,6 +116,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "ehDummyTemplate",
+            "tags": "[parameters('customTags')]",
             "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
@@ -128,6 +136,7 @@
             "type": "Microsoft.EventHub/namespaces",
             "apiVersion": "[variables('namespaceApiVersion')]",
             "name": "[parameters('namespaceName')]",
+            "tags": "[parameters('customTags')]",
             "location": "[parameters('location')]",
             "dependsOn": [],
             "sku": {
@@ -144,6 +153,7 @@
             "comments": "Azure Event Hub for collected metrics",
             "type": "Microsoft.EventHub/namespaces/eventhubs",
             "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubsName'))]",
+            "tags": "[parameters('customTags')]",
             "apiVersion": "[variables('instanceApiVersion')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -159,6 +169,7 @@
             "comments": "azure Event Hub namespace listen authorization rule",
             "type": "Microsoft.EventHub/namespaces/authorizationRules",
             "name": "[concat(parameters('namespaceName'), '/', parameters('listenPolicyName'))]",
+            "tags": "[parameters('customTags')]",
             "apiVersion": "[variables('namespaceAuthRulesApiVersion')]",
             "dependsOn": [
                 "[if(parameters('createNamespace'), variables('NamespaceId'), 'ehDummyTemplate')]"
@@ -173,6 +184,7 @@
             "comments": "azure Event Hub instance send authorization rule",
             "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
             "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubsName'), '/', parameters('sendPolicyName'))]",
+            "tags": "[parameters('customTags')]",
             "apiVersion": "[variables('instanceAuthRulesApiVersion')]",
             "dependsOn": [
                 "[variables('instanceId')]"

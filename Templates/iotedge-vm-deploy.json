@@ -31,6 +31,13 @@
     },
     "branchName": {
       "type": "string"
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {
@@ -46,6 +53,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgeNetworkSecurityGroupName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
@@ -71,6 +79,7 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgePublicIPAddressName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -87,6 +96,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgeNetworkInterfaceName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('edgePublicIPAddressName'))]",
@@ -114,6 +124,7 @@
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2019-12-01",
       "name": "[parameters('edgeVmName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('edgeNetworkInterfaceName'))]"
@@ -154,6 +165,7 @@
       "comments": "One time script to configure and onboard the IoT edge virtual machine",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('edgeVmName'), '/', 'scriptextensions')]",
+      "tags": "[parameters('customTags')]",
       "apiVersion": "2019-03-01",
       "location": "[parameters('location')]",
       "properties": {

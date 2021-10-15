@@ -1,6 +1,12 @@
 $root_path = Split-Path $PSScriptRoot -Parent
 Import-Module "$root_path/Scripts/PS-Library"
-$github_repo_url = "https://raw.githubusercontent.com/Azure-Samples/iotedge-logging-and-monitoring-solution"
+#$github_repo_url = "https://raw.githubusercontent.com/onderyildirim/iotedge-logging-and-monitoring-solution"
+#git config --get remote.origin.url: https://github.com/onderyildirim/iotedge-logging-and-monitoring-solution.git
+$github_repo_url = $(git config --get remote.origin.url)
+$github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
+$github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+
+Write-Host "github_repo_url: $($github_repo_url)"
 
 function Set-EnvironmentHash {
     param(
@@ -89,6 +95,32 @@ function Set-ResourceGroupName {
         }
         else {
             $script:create_resource_group = $false
+        }
+    }
+}
+
+function Set-CustomTags {
+    param()
+
+    $custom_tags_str = $null
+
+    while ($null -eq $script:custom_tags)
+    {
+        Write-Host
+        Write-Host "Provide a json document to be added to 'tags' in the format { `"tag1`": `"value1`", `"tag2`": `"value2`" } "
+
+        $custom_tags_str = Read-Host -Prompt ">"
+
+        $script:custom_tags = $null
+        try {
+            if ([string]::IsNullOrEmpty($custom_tags_str))
+                {
+                    $custom_tags_str="{}"
+                }
+            $script:custom_tags = ConvertFrom-Json $custom_tags_str -ErrorAction Stop;
+            }
+        catch {
+            Write-Output "Ran into an issue with the tags: $PSItem"
         }
     }
 }
@@ -373,8 +405,8 @@ function Set-EdgeInfrastructure {
         $script:vm_username = $vm_username
         $script:vm_password = New-Password -length $vm_password_length
 
-        $vm_sizes = az vm list-sizes --location $script:iot_hub_location | ConvertFrom-Json `
-        | Where-Object { $vm_sku_names -icontains $_.name } `
+        $vm_sizes = az vm list-sizes --location $script:iot_hub_location | ConvertFrom-Json
+        $vm_sizes = $vm_sizes | Where-Object { $vm_sku_names -icontains $_.name } `
         | Where-Object {
             ($_.numberOfCores -ge $vm_cpu_cores) -and `
             ($_.memoryInMB -ge $vm_memory_mb) -and `
@@ -636,6 +668,7 @@ function Set-ELMSAlerts {
         "functionHttpTriggerUrl"                  = @{ "value" = $alert_function_url }
         "templateUrl"                             = @{ "value" = $github_repo_url }
         "branchName"                              = @{ "value" = $(git rev-parse --abbrev-ref HEAD) }
+        "customTags"                              = @{ "value" = $script:custom_tags }
     }
     Set-Content -Path "$($root_path)/Templates/monitor-deploy.parameters.json" -Value (ConvertTo-Json $template_parameters -Depth 5)
 
@@ -769,6 +802,17 @@ function New-ELMSEnvironment() {
         }
     }
     #endregion
+
+    Set-CustomTags
+    if([string]::IsNullOrEmpty($script:custom_tags[0]))
+    {
+        Write-Host "Custom tags will not be used."  
+    }
+    else
+    {
+        Write-Host "Custom tags:`r`n$(ConvertTo-Json $script:custom_tags)`r`n"  
+    }
+     
 
     if ($deployment_option -eq 1) {
 
@@ -969,6 +1013,7 @@ function New-ELMSEnvironment() {
         "metricsEncoding"             = @{ "value" = $script:metrics_encoding }
         "templateUrl"                 = @{ "value" = $github_repo_url }
         "branchName"                  = @{ "value" = $(git rev-parse --abbrev-ref HEAD) }
+        "customTags"                              = @{ "value" = $script:custom_tags }
     }
 
     if ($script:create_iot_hub) {

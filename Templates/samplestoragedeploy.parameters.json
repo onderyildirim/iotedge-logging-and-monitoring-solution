@@ -1,0 +1,9 @@
+{
+    "resourceTags": {
+      "value": {
+        "Environment": "Dev",
+        "Project": "Tutorial"
+    }
+    }
+  }
+  

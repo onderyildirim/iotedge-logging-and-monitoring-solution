@@ -494,6 +494,13 @@
       "metadata": {
         "description": "GitHub repo branch name."
       }
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {
@@ -525,7 +532,17 @@
     "eventGridDeploymentName": "[concat('storagesystemtopic-', parameters('environmentHashId'))]",
     "eventHubsDeploymentName": "[concat('eventhubs-', parameters('environmentHashId'))]",
     "eventHubsConsumerGroup": "$default",
-    "linkedDeploymentApiVersion": "2020-10-01"
+    "linkedDeploymentApiVersion": "2020-10-01",
+    "appInsightsTags":{
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightsName')))]": "Resource"
+      },
+      "functionAppTags": {
+        "elms": "true",
+        "iotHub": "[resourceId(parameters('iotHubResourceGroup'), 'Microsoft.Devices/IotHubs', parameters('iotHubName'))]",
+        "storageAccount": "[resourceId(parameters('storageAccountResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+        "logAnalyticsWorkspace": "[variables('workspaceId')]",
+        "eventHubsInstance": "[if(parameters('createEventHubs'), resourceId(parameters('eventHubResourceGroup'), 'Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubsNamespace'), parameters('eventHubsName')), '')]"
+      }
   },
   "resources": [
     {
@@ -533,6 +550,7 @@
       "condition": "[parameters('createEventHubs')]",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('eventHubsDeploymentName')]",
+      "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('eventHubResourceGroup')]",
       "dependsOn": [],
       "properties": {
@@ -577,6 +595,9 @@
           },
           "sendPolicyName": {
             "value": "[parameters('eventHubsSendPolicyName')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
           }
         }
       }
@@ -586,6 +607,7 @@
       "condition": "[parameters('createEventHubs')]",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('iotHubDeploymentNames')['true']]",
+      "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('iotHubResourceGroup')]",
       "dependsOn": [
         "[variables('eventHubsDeploymentName')]"
@@ -686,6 +708,9 @@
           },
           "branchName": {
             "value": "[parameters('branchName')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
           }
         }
       }
@@ -695,6 +720,7 @@
       "condition": "[not(parameters('createEventHubs'))]",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('iotHubDeploymentNames')['false']]",
+      "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('iotHubResourceGroup')]",
       "dependsOn": [],
       "properties": {
@@ -778,6 +804,9 @@
           },
           "branchName": {
             "value": "[parameters('branchName')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
           }
         }
       }
@@ -786,6 +815,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('eventGridDeploymentName')]",
+      "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('storageAccountResourceGroup')]",
       "dependsOn": [],
       "properties": {
@@ -824,6 +854,9 @@
           },
           "eventGridSubscriptionFilter": {
             "value": "[variables('eventGridSubscriptionFilter')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
           }
         }
       }
@@ -834,6 +867,7 @@
       "type": "microsoft.operationalinsights/workspaces",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('workspaceLocation')]",
+      "tags": "[parameters('customTags')]",
       "properties": {
         "sku": {
           "name": "[parameters('workspaceSku')]"
@@ -850,6 +884,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2019-04-01",
       "name": "[variables('functionStorageAccountName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "kind": "StorageV2",
       "sku": {
@@ -860,6 +895,7 @@
       "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
       "apiVersion": "2019-06-01",
       "name": "[concat(variables('functionStorageAccountName'), '/default/', variables('functionFileShareName'))]",
+      "tags": "[parameters('customTags')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName'))]"
       ]
@@ -868,6 +904,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "[variables('functionApiVersion')]",
       "name": "[variables('functionAppHostingPlanName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "Y1",
@@ -882,10 +919,8 @@
       "type": "microsoft.insights/components",
       "apiVersion": "2020-02-02-preview",
       "name": "[variables('appInsightsName')]",
+      "tags": "[union(variables('appInsightsTags'),parameters('customTags'))]",
       "location": "[parameters('location')]",
-      "tags": {
-        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightsName')))]": "Resource"
-      },
       "properties": {
         "ApplicationId": "[variables('appInsightsName')]",
         "Request_Source": "IbizaWebAppExtensionCreate"
@@ -895,13 +930,7 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "[variables('functionApiVersion')]",
       "name": "[parameters('functionAppName')]",
-      "tags": {
-        "elms": "true",
-        "iotHub": "[resourceId(parameters('iotHubResourceGroup'), 'Microsoft.Devices/IotHubs', parameters('iotHubName'))]",
-        "storageAccount": "[resourceId(parameters('storageAccountResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-        "logAnalyticsWorkspace": "[variables('workspaceId')]",
-        "eventHubsInstance": "[if(parameters('createEventHubs'), resourceId(parameters('eventHubResourceGroup'), 'Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubsNamespace'), parameters('eventHubsName')), '')]"
-      },
+      "tags": "[union(variables('functionAppTags'),parameters('customTags'))]",
       "location": "[parameters('location')]",
       "kind": "functionapp",
       "dependsOn": [

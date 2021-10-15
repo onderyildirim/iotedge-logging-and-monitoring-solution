@@ -85,6 +85,13 @@
     },
     "branchName": {
       "type": "string"
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {
@@ -109,6 +116,7 @@
       "apiVersion": "2020-07-10-preview",
       "type": "Microsoft.Devices/Iothubs",
       "name": "[parameters('iotHubName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "sku": {
         "name": "[parameters('iotHubSku')]",
@@ -187,6 +195,7 @@
       "condition": "[parameters('createIoTHub')]",
       "type": "Microsoft.Devices/provisioningServices",
       "name": "[parameters('dpsName')]",
+      "tags": "[parameters('customTags')]",
       "apiVersion": "2018-01-22",
       "location": "[parameters('dpsLocation')]",
       "sku": {
@@ -212,6 +221,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2020-05-01",
       "name": "[parameters('vnetName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('edgeNetworkSecurityGroupName'))]"
@@ -241,6 +251,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgeNetworkSecurityGroupName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "properties": {
         "securityRules": [
@@ -267,6 +278,7 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgePublicIPAddressName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -284,6 +296,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2020-05-01",
       "name": "[variables('edgeNetworkInterfaceName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('edgePublicIPAddressName'))]",
@@ -313,6 +326,7 @@
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2019-12-01",
       "name": "[parameters('edgeVmName')]",
+      "tags": "[parameters('customTags')]",
       "location": "[parameters('iotHubLocation')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('edgeNetworkInterfaceName'))]"
@@ -354,6 +368,7 @@
       "condition": "[parameters('createIoTHub')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('edgeVmName'), '/', 'scriptextensions')]",
+      "tags": "[parameters('customTags')]",
       "apiVersion": "2019-03-01",
       "location": "[parameters('iotHubLocation')]",
       "properties": {

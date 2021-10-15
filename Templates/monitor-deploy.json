@@ -178,6 +178,13 @@
       "metadata": {
         "description": "GitHub repo branch name."
       }
+    },
+    "customTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Custom tags to be added to resources created. In the format '{ \"tag1\": \"value1\", \"tag2\": \"value2\" }'"
+      }
     }
   },
   "variables": {
@@ -214,13 +221,18 @@
       "[parameters('additionalActionGroup')]"
     ],
     "actionGroupNone": [],
-    "actionGroups": "[if(parameters('createFunctionActionGroup'), if(not(empty(parameters('additionalActionGroup'))), variables('actionGroupDual'), variables('actionGroupInternal')), if(not(empty(parameters('additionalActionGroup'))), variables('actionGroupExternal'), variables('actionGroupNone')))]"
+    "actionGroups": "[if(parameters('createFunctionActionGroup'), if(not(empty(parameters('additionalActionGroup'))), variables('actionGroupDual'), variables('actionGroupInternal')), if(not(empty(parameters('additionalActionGroup'))), variables('actionGroupExternal'), variables('actionGroupNone')))]",
+    "actionGroupTags": {
+      "elms": "true",
+      "scope": "[parameters('scope')]"
+    }
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "monitorDummyTemplate",
+      "tags": "[parameters('customTags')]",
       "dependsOn": [],
       "properties": {
         "mode": "Incremental",
@@ -240,11 +252,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('actionGroupDeploymentName')]",
+      "tags": "[union(variables('actionGroupTags'),parameters('customTags'))]",      
       "dependsOn": [],
-      "tags": {
-        "elms": "true",
-        "scope": "[parameters('scope')]"
-      },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -281,13 +290,10 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "name": "[variables('queueSizeAlertDeploymentName')]",
+      "tags": "[union(variables('actionGroupTags'),parameters('customTags'))]",      
       "dependsOn": [
         "[if(parameters('createFunctionActionGroup'), variables('actionGroupDeploymentName'), 'monitorDummyTemplate')]"
       ],
-      "tags": {
-        "elms": "true",
-        "scope": "[parameters('scope')]"
-      },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -360,10 +366,7 @@
       "dependsOn": [
         "[if(parameters('createFunctionActionGroup'), variables('actionGroupDeploymentName'), 'monitorDummyTemplate')]"
       ],
-      "tags": {
-        "elms": "true",
-        "scope": "[parameters('scope')]"
-      },
+      "tags": "[union(variables('actionGroupTags'),parameters('customTags'))]",      
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -439,10 +442,7 @@
       "dependsOn": [
         "[if(parameters('createFunctionActionGroup'), variables('actionGroupDeploymentName'), 'monitorDummyTemplate')]"
       ],
-      "tags": {
-        "elms": "true",
-        "scope": "[parameters('scope')]"
-      },
+      "tags": "[union(variables('actionGroupTags'),parameters('customTags'))]",      
       "properties": {
         "mode": "Incremental",
         "templateLink": {
