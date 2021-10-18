@@ -4,9 +4,13 @@ Import-Module "$root_path/Scripts/PS-Library"
 #git config --get remote.origin.url: https://github.com/onderyildirim/iotedge-logging-and-monitoring-solution.git
 $github_repo_url = $(git config --get remote.origin.url)
 $github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
-$github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+if ($github_repo_url.substring($github_repo_url.length-4,4) -ieq ".git")
+{
+    $github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+}
 
 Write-Host "github_repo_url: $($github_repo_url)"
+Write-Host "Root path: $($root_path)"
 
 function Set-EnvironmentHash {
     param(
