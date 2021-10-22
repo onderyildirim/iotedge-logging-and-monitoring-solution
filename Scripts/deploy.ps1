@@ -1,12 +1,15 @@
 $root_path = Split-Path $PSScriptRoot -Parent
 Import-Module "$root_path/Scripts/PS-Library"
-#$github_repo_url = "https://raw.githubusercontent.com/onderyildirim/iotedge-logging-and-monitoring-solution"
-#git config --get remote.origin.url: https://github.com/onderyildirim/iotedge-logging-and-monitoring-solution.git
+
 $github_repo_url = $(git config --get remote.origin.url)
 $github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
 if ($github_repo_url.substring($github_repo_url.length-4,4) -ieq ".git")
 {
     $github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+}
+elseif ([String]::IsNullOrEmpty($github_repo_url))
+{
+    $github_repo_url = "https://raw.githubusercontent.com/Azure-Samples/iotedge-logging-and-monitoring-solution"
 }
 
 Write-Host "github_repo_url: $($github_repo_url)"
