@@ -1,0 +1,24 @@
+{
+    "logicAppName":  {
+        "value":  "device-status-update-app"
+    },
+    "logAnalyticsConnectionName":  {
+        "value":  "azureloganalyticsdatacollector"
+    },
+    "location":  {
+        "value":  "eastus2"
+    },
+    "environmentHashId":  {
+        "value":  "2990ce70"
+    },
+    "logAnalyticsWorkspaceName": {
+        "value":"iotedgelogs-2990ce70"
+    },
+    "logAnalyticsResourceGroup": {
+        "value": "edgelogrg5"
+    },
+    "iotHubResourceId" : {
+        "value": "/subscriptions/227b49ad-8f51-4c95-a038-4a7fa6bbb938/resourceGroups/edgelogrg5/providers/Microsoft.Devices/IotHubs/iothub-2990ce70"
+    }
+
+}

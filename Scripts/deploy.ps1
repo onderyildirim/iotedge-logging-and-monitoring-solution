@@ -384,6 +384,30 @@ function Set-EventHubsNamespace {
     }
 }
 
+function Set-LogicAppNamespace {
+    if (!$script:sandbox) {
+        $logicapp = Get-NewOrExistingResource -type "Microsoft.Logic/workflows" -display_name "device-status-update-app (logic app)" -separator "`r`n`r`n"
+
+        if (!!$workspace) {
+            $script:create_logicapp = $false
+            $script:logicapp_name = $logicapp.name
+            $script:logicapp_resource_group = $logicapp.resourceGroup
+            $script:logicapp_location = $logicapp.location
+        }
+        else {
+            $script:create_logicapp = $true
+        }
+    }
+    else {
+        $script:create_logicapp = $true
+    }
+
+    if ($script:create_logicapp) {
+        $script:logicapp_resource_group = $script:resource_group_name
+        $script:logicapp_name = "device-status-update-app-$($script:env_hash)"
+    }
+}
+
 function Set-EdgeInfrastructure {
     param (
         [string] $vm_prefix = "iotedgevm",
@@ -936,10 +960,12 @@ function New-ELMSEnvironment() {
 
     if ($script:enable_monitoring) {
         Set-EventHubsNamespace -route_condition  "id = '$metrics_collector_message_id'"
+        Set-LogicAppNamespace
     }
     else {
         $script:create_event_hubs_namespace = $false
         $script:create_event_hubs = $false
+        $script:create_logicapp = $false
     }
     #endregion
 
@@ -982,6 +1008,9 @@ function New-ELMSEnvironment() {
     if (!$script:event_hubs_location) {
         $script:event_hubs_location = $script:iot_hub_location
     }
+    if (!$script:logicapp_location) {
+        $script:logicapp_location = $script:iot_hub_location
+    }
     #endregion
 
     #region create deployment
@@ -1009,6 +1038,10 @@ function New-ELMSEnvironment() {
         "workspaceLocation"           = @{ "value" = $script:workspace_location }
         "workspaceName"               = @{ "value" = $script:workspace_name }
         "workspaceResourceGroup"      = @{ "value" = $script:workspace_resource_group }
+        "createLogicApp"              = @{ "value" = $script:create_logicapp }
+        "logicappLocation"            = @{ "value" = $script:logicapp_location }
+        "logicappName"                = @{ "value" = $script:logicapp_name }
+        "logicappResourceGroup"       = @{ "value" = $script:logicapp_resource_group }
         "functionAppName"             = @{ "value" = $script:function_app_name }
         "httpTriggerFunction"         = @{ "value" = $script:invoke_log_upload_function_name }
         "logsRegex"                   = @{ "value" = $script:logs_regex }

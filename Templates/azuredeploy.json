@@ -495,6 +495,32 @@
         "description": "GitHub repo branch name."
       }
     },
+    "createLogicApp": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether to create a new Logic app."
+      }
+    },
+    "logicappLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Logic app location."
+      }
+    },
+    "logicappName": {
+      "type": "string",
+      "metadata": {
+        "description": "Logic App name."
+      }
+    },
+    "logicappResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Log analytics Workspace resource group."
+      }
+    },
     "customTags": {
       "type": "object",
       "defaultValue": {},
@@ -531,6 +557,7 @@
     },
     "eventGridDeploymentName": "[concat('storagesystemtopic-', parameters('environmentHashId'))]",
     "eventHubsDeploymentName": "[concat('eventhubs-', parameters('environmentHashId'))]",
+    "logicAppDeploymentName": "[concat('logicapp-', parameters('environmentHashId'))]",
     "eventHubsConsumerGroup": "$default",
     "linkedDeploymentApiVersion": "2020-10-01",
     "appInsightsTags":{
@@ -861,6 +888,54 @@
         }
       }
     },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('linkedDeploymentApiVersion')]",
+      "condition": "[parameters('createLogicApp')]",
+      "name": "[variables('logicAppDeploymentName')]",
+      "tags": "[parameters('customTags')]",
+      "resourceGroup": "[parameters('logicappResourceGroup')]",
+      "dependsOn": [
+        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('iotHubDeploymentName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "contentVersion": "1.0.0.0",
+          "uri": "[concat(parameters('templateUrl'), '/', parameters('branchName'), '/Templates/logicapp-deploy.json')]"
+        },
+        "parameters": {
+          "logicappName": {
+            "value": "[parameters('logicappName')]"
+          },
+          "location": {
+            "value": "[parameters('logicappLocation')]"
+          },
+          "logicappResourceGroup": {
+            "value": "[parameters('logicappResourceGroup')]"
+          },
+          "logAnalyticsResourceGroup": {
+            "value": "[parameters('workspaceResourceGroup')]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('workspaceName')]"
+          },
+          "iothubResourceGroup": {
+            "value": "[parameters('iotHubResourceGroup')]"
+          },
+          "iothubName": {
+            "value": "[parameters('iotHubName')]"
+          },
+          "environmentHashId": {
+            "value": "[parameters('environmentHashId')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
+          }
+        }
+      }
+    },    
     {
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "condition": "[parameters('createWorkspace')]",
