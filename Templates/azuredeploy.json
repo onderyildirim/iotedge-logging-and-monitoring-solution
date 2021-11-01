@@ -912,9 +912,6 @@
           "location": {
             "value": "[parameters('logicappLocation')]"
           },
-          "logicappResourceGroup": {
-            "value": "[parameters('logicappResourceGroup')]"
-          },
           "logAnalyticsResourceGroup": {
             "value": "[parameters('workspaceResourceGroup')]"
           },
