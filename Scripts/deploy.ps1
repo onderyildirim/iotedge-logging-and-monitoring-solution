@@ -114,7 +114,7 @@ function Set-CustomTags {
     while ($null -eq $script:custom_tags)
     {
         Write-Host
-        Write-Host "Provide a json document to be added to 'tags' in the format { `"tag1`": `"value1`", `"tag2`": `"value2`" } "
+        Write-Host "Provide a json document to be added to 'tags' in the format { `"tag1`": `"value1`", `"tag2`": `"value2`" }. Press enter to continue without custom tags. "
 
         $custom_tags_str = Read-Host -Prompt ">"
 

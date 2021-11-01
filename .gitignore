@@ -19,9 +19,6 @@ mono_crash.*
 # Parameter files
 *.parameters.json
 
-# Sample templates
-sample*.json
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
