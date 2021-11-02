@@ -895,7 +895,7 @@
       "condition": "[parameters('createLogicApp')]",
       "name": "[variables('logicAppDeploymentName')]",
       "tags": "[parameters('customTags')]",
-      "resourceGroup": "[parameters('logicappResourceGroup')]",
+      "resourceGroup": "[parameters('iotHubResourceGroup')]",
       "dependsOn": [
         "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
         "[variables('iotHubDeploymentName')]"
@@ -913,44 +913,14 @@
           "location": {
             "value": "[parameters('logicappLocation')]"
           },
+          "logicappResourceGroup": {
+            "value": "[parameters('logicappResourceGroup')]"
+          },
           "logAnalyticsResourceGroup": {
             "value": "[parameters('workspaceResourceGroup')]"
           },
           "logAnalyticsWorkspaceName": {
             "value": "[parameters('workspaceName')]"
-          },
-          "customTags": {
-            "value": "[parameters('customTags')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('linkedDeploymentApiVersion')]",
-      "condition": "[parameters('createLogicApp')]",
-      "name": "[variables('eventGridLogicAppDeploymentName')]",
-      "tags": "[parameters('customTags')]",
-      "resourceGroup": "[parameters('iotHubResourceGroup')]",
-      "dependsOn": [
-        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
-        "[variables('iotHubDeploymentName')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "contentVersion": "1.0.0.0",
-          "uri": "[concat(parameters('templateUrl'), '/', parameters('branchName'), '/Templates/eventgrid-deploy.json')]"
-        },
-        "parameters": {
-          "logicappName": {
-            "value": "[parameters('logicappName')]"
-          },
-          "logicappResourceGroup": {
-            "value": "[parameters('logicappResourceGroup')]"
-          },
-          "location": {
-            "value": "[parameters('logicappLocation')]"
           },
           "iothubResourceGroup": {
             "value": "[parameters('iotHubResourceGroup')]"
@@ -966,7 +936,7 @@
           }
         }
       }
-    },    
+    },
     {
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "condition": "[parameters('createWorkspace')]",
