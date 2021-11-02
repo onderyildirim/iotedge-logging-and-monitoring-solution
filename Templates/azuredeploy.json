@@ -979,7 +979,7 @@
       "resourceGroup": "[parameters('iotHubResourceGroup')]",
       "dependsOn": [
         "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
-        "[variables('iotHubDeploymentName')]"
+        "[variables('logicAppDeploymentName')]"
       ],
       "properties": {
         "mode": "Incremental",
