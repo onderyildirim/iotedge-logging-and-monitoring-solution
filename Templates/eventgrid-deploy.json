@@ -79,7 +79,7 @@
                         "properties": {
                             "maxEventsPerBatch": 1,
                             "preferredBatchSizeInKilobytes": 64,
-                            "endpointUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                            "endpointUrl": "[listCallbackURL(concat(resourceId(parameters('logicappResourceGroup'), 'Microsoft.Logic/workflows', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
                         },
                         "endpointType": "WebHook"
                     },
