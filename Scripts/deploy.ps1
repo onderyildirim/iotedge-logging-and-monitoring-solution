@@ -2,18 +2,21 @@ $root_path = Split-Path $PSScriptRoot -Parent
 Import-Module "$root_path/Scripts/PS-Library"
 
 $github_repo_url = $(git config --get remote.origin.url)
-$github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
-if ($github_repo_url.substring($github_repo_url.length-4,4) -ieq ".git")
-{
-    $github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
-}
-elseif ([String]::IsNullOrEmpty($github_repo_url))
+if ([String]::IsNullOrEmpty($github_repo_url))
 {
     $github_repo_url = "https://raw.githubusercontent.com/Azure-Samples/iotedge-logging-and-monitoring-solution"
 }
+else
+{
+    $github_repo_url = $github_repo_url.replace('github.com','raw.githubusercontent.com')
+    if ($github_repo_url.substring($github_repo_url.length-4,4) -ieq ".git")
+    {
+        $github_repo_url = $github_repo_url.substring(0, $github_repo_url.length-4)
+    }
+}
 
-Write-Host "github_repo_url: $($github_repo_url)"
-Write-Host "Root path: $($root_path)"
+#Write-Host "github_repo_url: $($github_repo_url)"
+#Write-Host "Root path: $($root_path)"
 
 function Set-EnvironmentHash {
     param(
@@ -137,13 +140,17 @@ function Get-InputSelection {
         [array] $options,
         $text,
         $separator = "`r`n",
-        $default_index = $null
+        $default_index = $null,
+        [boolean] $allow_selection_from_other_subscription = $false
     )
 
     Write-Host
     Write-Host $text -Separator "`r`n`r`n"
     $indexed_options = @()
-    $indexed_options += ("0: Select a resource from another subscription")
+    if($allow_selection_from_other_subscription -eq $true)
+    {
+        $indexed_options += ("0: Select a resource from another subscription")
+    }
     for ($index = 0; $index -lt $options.Count; $index++) {
         $indexed_options += ("$($index + 1): $($options[$index])")
     }
@@ -164,7 +171,10 @@ function Get-InputSelection {
                 $option = $default_index
                 break
             }
-            elseif ([int] $option -ge 0 -and [int] $option -le $options.Count) {
+            elseif ($allow_selection_from_other_subscription -eq $true -and [int] $option -ge 0 -and [int] $option -le $options.Count) {
+                break
+            }
+            elseif ($allow_selection_from_other_subscription -eq $false -and [int] $option -ge 1 -and [int] $option -le $options.Count) {
                 break
             }
         }
@@ -194,7 +204,8 @@ function Get-ExistingResource {
             $option = Get-InputSelection `
                 -options $resources.id `
                 -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
-                -separator $separator
+                -separator $separator `
+                -allow_selection_from_other_subscription $true
 
             if ($option -eq 0)
             {
@@ -238,7 +249,8 @@ function Get-NewOrExistingResource {
             $option = Get-InputSelection `
                 -options $resources.id `
                 -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
-                -separator $separator
+                -separator $separator `
+                -allow_selection_from_other_subscription $true
 
             return $resources[$option - 1]
         }
