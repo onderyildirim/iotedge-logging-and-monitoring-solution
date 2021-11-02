@@ -558,6 +558,7 @@
     "eventGridDeploymentName": "[concat('storagesystemtopic-', parameters('environmentHashId'))]",
     "eventHubsDeploymentName": "[concat('eventhubs-', parameters('environmentHashId'))]",
     "logicAppDeploymentName": "[concat('logicapp-', parameters('environmentHashId'))]",
+    "eventGridLogicAppDeploymentName": "[concat('logicappsystemtopic-', parameters('environmentHashId'))]",
     "eventHubsConsumerGroup": "$default",
     "linkedDeploymentApiVersion": "2020-10-01",
     "appInsightsTags":{
@@ -917,6 +918,36 @@
           },
           "logAnalyticsWorkspaceName": {
             "value": "[parameters('workspaceName')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('linkedDeploymentApiVersion')]",
+      "condition": "[parameters('createLogicApp')]",
+      "name": "[variables('eventGridLogicAppDeploymentName')]",
+      "tags": "[parameters('customTags')]",
+      "resourceGroup": "[parameters('iotHubResourceGroup')]",
+      "dependsOn": [
+        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('iotHubDeploymentName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "contentVersion": "1.0.0.0",
+          "uri": "[concat(parameters('templateUrl'), '/', parameters('branchName'), '/Templates/eventgrid-deploy.json')]"
+        },
+        "parameters": {
+          "logicappName": {
+            "value": "[parameters('logicappName')]"
+          },
+          "location": {
+            "value": "[parameters('logicappLocation')]"
           },
           "iothubResourceGroup": {
             "value": "[parameters('iotHubResourceGroup')]"
