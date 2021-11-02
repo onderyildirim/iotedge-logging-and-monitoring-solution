@@ -36,6 +36,25 @@
                 "description": "Log analytics workspace name"
             }
         },
+        "environmentHashId": {
+        "type": "string",
+        "metadata": {
+            "description": "Unique alphanumeric id to append to multiple resource names."
+        }
+        },
+        "iotHubResourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "IoT Hub resource group"
+            }
+        },
+        "iotHubName" : {
+            "type": "string",
+            "metadata": {
+                "description": "IoT Hub where status events will be collected."
+            }
+        },
         "customTags": {
         "type": "object",
         "defaultValue": {},
@@ -44,7 +63,55 @@
         }
         }        
     },
+    "variables": {
+    "systemTopicName": "[concat('statusupdate-', parameters('environmentHashId'))]"
+    },
     "resources": [
+            {
+                "type": "Microsoft.EventGrid/systemTopics",
+                "apiVersion": "2021-06-01-preview",
+                "name": "[variables('systemTopicName')]",
+                "tags": "[parameters('customTags')]",
+                "location": "[parameters('location')]",
+                "properties": {
+                    "source": "[resourceId(parameters('iotHubResourceGroup'),'Microsoft.Devices/IotHubs', parameters('iotHubName'))]",
+                    //"source": "[parameters('iotHubResourceId')]",
+                    "topicType": "Microsoft.Devices.IoTHubs"
+                }
+            },
+            {
+                "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+                "apiVersion": "2021-06-01-preview",
+                "name": "[concat(variables('systemTopicName'), '/eventgrid-to-logicapp')]",
+                "tags": "[parameters('customTags')]",
+                "dependsOn": [
+                    "[resourceId('Microsoft.EventGrid/systemTopics', variables('systemTopicName'))]",
+                    "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]"
+                ],
+                "properties": {
+                    "destination": {
+                        "properties": {
+                            "maxEventsPerBatch": 1,
+                            "preferredBatchSizeInKilobytes": 64,
+                            "endpointUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                        },
+                        "endpointType": "WebHook"
+                    },
+                    "filter": {
+                        "includedEventTypes": [
+                            "Microsoft.Devices.DeviceConnected",
+                            "Microsoft.Devices.DeviceDisconnected"
+                        ],
+                        "enableAdvancedFilteringOnArrays": true
+                    },
+                    "labels": [],
+                    "eventDeliverySchema": "EventGridSchema",
+                    "retryPolicy": {
+                        "maxDeliveryAttempts": 30,
+                        "eventTimeToLiveInMinutes": 1440
+                    }
+                }
+            },
             {
             "type": "Microsoft.Web/connections",
             "apiVersion": "2018-07-01-preview",
