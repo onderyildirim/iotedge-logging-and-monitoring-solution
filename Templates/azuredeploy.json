@@ -946,6 +946,9 @@
           "logicappName": {
             "value": "[parameters('logicappName')]"
           },
+          "logicappResourceGroup": {
+            "value": "[parameters('logicappResourceGroup')]"
+          },
           "location": {
             "value": "[parameters('logicappLocation')]"
           },

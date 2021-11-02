@@ -9,6 +9,12 @@
                 "description": "Logic App name."
             }
         },
+        "logicappResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Logic App resource group."
+            }
+        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
@@ -66,7 +72,7 @@
                 "tags": "[parameters('customTags')]",
                 "dependsOn": [
                     "[resourceId('Microsoft.EventGrid/systemTopics', variables('systemTopicName'))]",
-                    "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]"
+                    "[resourceId(parameters('logicappResourceGroup'), 'Microsoft.Logic/workflows', parameters('logicAppName'))]"
                 ],
                 "properties": {
                     "destination": {
