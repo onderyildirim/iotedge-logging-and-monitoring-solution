@@ -143,6 +143,7 @@ function Get-InputSelection {
     Write-Host
     Write-Host $text -Separator "`r`n`r`n"
     $indexed_options = @()
+    $indexed_options += ("0: Select a resource from another subscription")
     for ($index = 0; $index -lt $options.Count; $index++) {
         $indexed_options += ("$($index + 1): $($options[$index])")
     }
@@ -163,7 +164,7 @@ function Get-InputSelection {
                 $option = $default_index
                 break
             }
-            elseif ([int] $option -ge 1 -and [int] $option -le $options.Count) {
+            elseif ([int] $option -ge 0 -and [int] $option -le $options.Count) {
                 break
             }
         }
@@ -172,7 +173,7 @@ function Get-InputSelection {
         }
 
         Write-Host
-        Write-Host "Choose from the list using an index between 1 and $($options.Count)."
+        Write-Host "Choose from the list using an index between 0 and $($options.Count)."
     }
 
     return $option
@@ -186,17 +187,27 @@ function Get-ExistingResource {
     )
  
     $resources = az resource list --resource-type $type | ConvertFrom-Json | Sort-Object -Property id
-    if ($resources.Count -gt 0) {
-        
-        $option = Get-InputSelection `
-            -options $resources.id `
-            -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
-            -separator $separator
+    while($true)
+    {
+        if ($resources.Count -gt 0) {
+            
+            $option = Get-InputSelection `
+                -options $resources.id `
+                -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
+                -separator $separator
 
-        return $resources[$option - 1]
-    }
-    else {
-        return $null
+            if ($option -eq 0)
+            {
+                $newsub = Read-Host -Prompt "Enter name or id of subscription >"
+                $resources = az resource list --subscription $newsub --resource-type $type | ConvertFrom-Json | Sort-Object -Property id
+            }
+            else {
+                return $resources[$option - 1]
+            }
+        }
+        else {
+            return $null
+        }
     }
 }
 

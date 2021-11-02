@@ -938,6 +938,42 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('linkedDeploymentApiVersion')]",
       "condition": "[parameters('createLogicApp')]",
+      "name": "[variables('logicAppDeploymentName')]",
+      "tags": "[parameters('customTags')]",
+      "resourceGroup": "[parameters('logicappResourceGroup')]",
+      "dependsOn": [
+        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('iotHubDeploymentName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "contentVersion": "1.0.0.0",
+          "uri": "[concat(parameters('templateUrl'), '/', parameters('branchName'), '/Templates/logicapp-deploy.json')]"
+        },
+        "parameters": {
+          "logicappName": {
+            "value": "[parameters('logicappName')]"
+          },
+          "location": {
+            "value": "[parameters('logicappLocation')]"
+          },
+          "logAnalyticsResourceGroup": {
+            "value": "[parameters('workspaceResourceGroup')]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('workspaceName')]"
+          },
+          "customTags": {
+            "value": "[parameters('customTags')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('linkedDeploymentApiVersion')]",
+      "condition": "[parameters('createLogicApp')]",
       "name": "[variables('eventGridLogicAppDeploymentName')]",
       "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('iotHubResourceGroup')]",
@@ -969,42 +1005,6 @@
           },
           "environmentHashId": {
             "value": "[parameters('environmentHashId')]"
-          },
-          "customTags": {
-            "value": "[parameters('customTags')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('linkedDeploymentApiVersion')]",
-      "condition": "[parameters('createLogicApp')]",
-      "name": "[variables('logicAppDeploymentName')]",
-      "tags": "[parameters('customTags')]",
-      "resourceGroup": "[parameters('logicappResourceGroup')]",
-      "dependsOn": [
-        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
-        "[variables('iotHubDeploymentName')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "contentVersion": "1.0.0.0",
-          "uri": "[concat(parameters('templateUrl'), '/', parameters('branchName'), '/Templates/logicapp-deploy.json')]"
-        },
-        "parameters": {
-          "logicappName": {
-            "value": "[parameters('logicappName')]"
-          },
-          "location": {
-            "value": "[parameters('logicappLocation')]"
-          },
-          "logAnalyticsResourceGroup": {
-            "value": "[parameters('workspaceResourceGroup')]"
-          },
-          "logAnalyticsWorkspaceName": {
-            "value": "[parameters('workspaceName')]"
           },
           "customTags": {
             "value": "[parameters('customTags')]"
