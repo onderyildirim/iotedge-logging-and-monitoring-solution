@@ -71,8 +71,8 @@
                 "name": "[concat(variables('systemTopicName'), '/eventgrid-to-logicapp')]",
                 "tags": "[parameters('customTags')]",
                 "dependsOn": [
-                    "[resourceId('Microsoft.EventGrid/systemTopics', variables('systemTopicName'))]",
-                    "[resourceId(parameters('logicappResourceGroup'), 'Microsoft.Logic/workflows', parameters('logicAppName'))]"
+                    "[resourceId('Microsoft.EventGrid/systemTopics', variables('systemTopicName'))]"
+                    //"[resourceId(parameters('logicappResourceGroup'), 'Microsoft.Logic/workflows', parameters('logicAppName'))]"
                 ],
                 "properties": {
                     "destination": {
