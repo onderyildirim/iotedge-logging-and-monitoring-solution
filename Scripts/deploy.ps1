@@ -473,7 +473,7 @@ function Set-LogicAppNamespace {
     if ($script:create_logicapp) {
         $script:logicapp_resource_group = $script:resource_group_name
         $script:logicapp_name = Get-Param -Prompt "Logic App name" -DefaultValue "device-status-update-app-$($script:env_hash)"
-        $script:logAnalyticsAPIConnectionName = Get-Param -Prompt "Logic App log analytics collector name" -DefaultValue "azureloganalyticsdatacollector-$($script:env_hash)"
+        $script:loganalytics_api_connection_name = Get-Param -Prompt "Logic App log analytics collector name" -DefaultValue "azureloganalyticsdatacollector-$($script:env_hash)"
     }
 }
 
@@ -1113,6 +1113,7 @@ function New-ELMSEnvironment() {
         "logicappLocation"            = @{ "value" = $script:logicapp_location }
         "logicappName"                = @{ "value" = $script:logicapp_name }
         "logicappResourceGroup"       = @{ "value" = $script:logicapp_resource_group }
+        "logAnalyticsAPIConnectionName"= @{ "value" = $script:loganalytics_api_connection_name }
         "functionAppName"             = @{ "value" = $script:function_app_name }
         "functionStorageAccountName"  = @{ "value" = $script:function_storage_account_name }
         "httpTriggerFunction"         = @{ "value" = $script:invoke_log_upload_function_name }
