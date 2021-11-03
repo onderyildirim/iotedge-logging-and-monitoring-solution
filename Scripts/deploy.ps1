@@ -1,7 +1,7 @@
 $root_path = Split-Path $PSScriptRoot -Parent
 Import-Module "$root_path/Scripts/PS-Library"
 
-$script:subscriptionid=$(az account list --query "[?isDefault].id | [0]" --only-show-errors)
+$script:subscriptionid=$(az account list --query "[?isDefault].id | [0]" --only-show-errors  --output tsv)
 
 $github_repo_url = $(git config --get remote.origin.url)
 if ([String]::IsNullOrEmpty($github_repo_url))
