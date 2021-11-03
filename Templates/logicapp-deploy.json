@@ -9,7 +9,7 @@
                 "description": "Logic App name."
             }
         },
-        "logAnalyticsConnectionName": {
+        "logAnalyticsAPIConnectionName": {
             "type": "String",
             "defaultValue": "azureloganalyticsdatacollector",
             "metadata": {
@@ -55,7 +55,7 @@
             {
             "type": "Microsoft.Web/connections",
             "apiVersion": "2018-07-01-preview",
-            "name": "[parameters('logAnalyticsConnectionName')]",
+            "name": "[parameters('logAnalyticsAPIConnectionName')]",
             "tags": "[parameters('customTags')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -77,7 +77,7 @@
             "tags": "[parameters('customTags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/connections', parameters('logAnalyticsConnectionName'))]"
+                "[resourceId('Microsoft.Web/connections', parameters('logAnalyticsAPIConnectionName'))]"
             ],
             "properties": {
                 "state": "Enabled",
@@ -207,8 +207,8 @@
                     "$connections": {
                         "value": {
                             "azureloganalyticsdatacollector": {
-                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('logAnalyticsConnectionName'))]",
-                                "connectionName": "[parameters('logAnalyticsConnectionName')]",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('logAnalyticsAPIConnectionName'))]",
+                                "connectionName": "[parameters('logAnalyticsAPIConnectionName')]",
                                 "id": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', parameters('location'), 'azureloganalyticsdatacollector')]"
                             }
                         }

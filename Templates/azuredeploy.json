@@ -432,6 +432,13 @@
         "description": "Name for the Function App resource."
       }
     },
+    "functionStorageAccountName": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('functionAppName'), '-storage')]",
+      "metadata": {
+        "description": "Name for the Function App storage resource."
+      }
+    },
     "httpTriggerFunction": {
       "type": "string",
       "defaultValue": "InvokeUploadModuleLogs",
@@ -528,6 +535,12 @@
         "description": "Log analytics Workspace resource group."
       }
     },
+    "logAnalyticsAPIConnectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Log analytics API connection name."
+      }
+    },
     "customTags": {
       "type": "object",
       "defaultValue": {},
@@ -543,10 +556,10 @@
     "eventGridSubscriptionName": "[concat('iotedgemodulelogs', parameters('environmentHashId'))]",
     "eventGridSubscriptionFilter": "[concat('/blobServices/default/containers/', parameters('storageContainerName'), '/')]",
     "functionAppHostingPlanName": "[concat(parameters('functionAppName'), '-plan')]",
-    "functionStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'function')]",
+    "functionStorageAccountName": "[parameters('functionStorageAccountName')]",
     "functionStorageAccountSku": "Standard_LRS",
     "storageAccountEndpointSuffix": "[if(startsWith(resourceGroup().location, 'usgov'), 'core.usgovcloudapi.net', if(startsWith(resourceGroup().location, 'usdod'), 'core.usgovcloudapi.net', 'core.windows.net'))]",
-    "functionFileShareName": "[substring(replace(concat(toLower(parameters('functionAppName')), parameters('environmentHashId')), '-', ''), 0, 25)]",
+    "functionFileShareName": "[take(replace(concat(toLower(parameters('functionAppName')), parameters('environmentHashId')), '-', ''), 25)]",
     "functionAppResourceId": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
     "functionApiVersion": "2018-11-01",
     "appInsightsName": "[parameters('functionAppName')]",
@@ -961,6 +974,9 @@
         "parameters": {
           "logicappName": {
             "value": "[parameters('logicappName')]"
+          },
+          "logAnalyticsAPIConnectionName": {
+            "value": "[parameters('logAnalyticsAPIConnectionName')]"
           },
           "location": {
             "value": "[parameters('logicappLocation')]"

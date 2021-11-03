@@ -280,6 +280,29 @@ function Get-NewOrExistingResource {
     }
 }
 
+function Get-Param {
+    param(
+        [string] $Prompt,
+        [string] $DefaultValue = ""
+    )
+    $paramval =  $null
+    if( -not $script:sandbox )
+    {
+        $promptstr = "Enter $($Prompt)"
+        if (-not [string]::IsNullOrEmpty($DefaultValue))
+        {
+            $promptstr = "$($promptstr) (Press enter to use '$($DefaultValue)')"
+        }
+        $promptstr = "$($promptstr) >"
+        $paramval =  Read-Host -Prompt $promptstr
+    }
+    if (-not [string]::IsNullOrEmpty($DefaultValue) -and [string]::IsNullOrEmpty($paramval))
+    {
+        $paramval =  $DefaultValue
+    }
+    return $paramval
+}
+
 function Set-IoTHub {
     param(
         [string] $prefix = "iothub",
@@ -304,7 +327,7 @@ function Set-IoTHub {
 
     if ($script:create_iot_hub) {
         $script:iot_hub_resource_group = $script:resource_group_name
-        $script:iot_hub_name = "$($prefix)-$($script:env_hash)"
+        $script:iot_hub_name = Get-Param -Prompt "IoT Hub name" -DefaultValue "$($prefix)-$($script:env_hash)"
         $script:iot_hub_policy_name = $policy_name
     }
 }
@@ -346,11 +369,11 @@ function Set-Storage {
 
     if ($script:create_storage) {
         $script:storage_account_resource_group = $script:resource_group_name
-        $script:storage_account_name = "$($prefix)$($script:env_hash)"
+        $script:storage_account_name = Get-Param -Prompt "Storage account name" -DefaultValue "$($prefix)$($script:env_hash)"
     }
 
     if ($script:create_event_grid) {
-        $script:event_grid_topic_name = "$($prefix)-$($script:env_hash)"
+        $script:event_grid_topic_name = Get-Param -Prompt "Storage event grid topic name" -DefaultValue "$($prefix)-$($script:env_hash)"
     }
 
     $script:storage_container_name = "$($prefix)$($script:env_hash)"
@@ -381,7 +404,7 @@ function Set-LogAnalyticsWorkspace {
     if ($script:create_workspace) {
         $script:workspace_subscription = $script:subscriptionid
         $script:workspace_resource_group = $script:resource_group_name
-        $script:workspace_name = "$($prefix)-$($script:env_hash)"
+        $script:workspace_name = Get-Param -Prompt "Log Analytics Workspace name" -DefaultValue "$($prefix)-$($script:env_hash)"
     }
 }
 
@@ -412,7 +435,7 @@ function Set-EventHubsNamespace {
 
         if ($script:create_event_hubs_namespace) {
             $script:event_hubs_resource_group = $script:iot_hub_resource_group
-            $script:event_hubs_namespace = "$($prefix)-$($script:env_hash)"
+            $script:event_hubs_namespace = Get-Param -Prompt "Event Hubs name" -DefaultValue "$($prefix)-$($script:env_hash)"
         }
 
         $script:create_event_hubs = $true
@@ -449,7 +472,8 @@ function Set-LogicAppNamespace {
 
     if ($script:create_logicapp) {
         $script:logicapp_resource_group = $script:resource_group_name
-        $script:logicapp_name = "device-status-update-app-$($script:env_hash)"
+        $script:logicapp_name = Get-Param -Prompt "Logic App name" -DefaultValue "device-status-update-app-$($script:env_hash)"
+        $script:logAnalyticsAPIConnectionName = Get-Param -Prompt "Logic App log analytics collector name" -DefaultValue "azureloganalyticsdatacollector-$($script:env_hash)"
     }
 }
 
@@ -474,7 +498,7 @@ function Set-EdgeInfrastructure {
         $vm_skus = $skus | Where-Object { $_.resourceType -ieq 'virtualMachines' -and $_.restrictions.Count -eq 0 }
         $vm_sku_names = $vm_skus | Select-Object -ExpandProperty Name -Unique
         
-        $script:vm_name = "$($vm_prefix)-$($script:env_hash)"
+        $script:vm_name = Get-Param -Prompt "Edge VM name" -DefaultValue "$($vm_prefix)-$($script:env_hash)"
         $script:vm_username = $vm_username
         $script:vm_password = New-Password -length $vm_password_length
 
@@ -496,7 +520,7 @@ function Set-EdgeInfrastructure {
         #endregion
 
         #region virtual network parameters
-        $script:vnet_name = "$($vnet_prefix)-$($script:env_hash)"
+        $script:vnet_name = Get-Param -Prompt "Edge VNET name" -DefaultValue "$($vnet_prefix)-$($script:env_hash)"
         $script:vnet_addr_prefix = $vnet_addr_prefix
         $script:subnet_name = $subnet_name
         $script:subnet_addr_prefix = $subnet_addr_prefix
@@ -808,7 +832,6 @@ function New-ELMSEnvironment() {
     $metrics_collector_message_id = "origin-iotedge-metrics-collector"
     $script:deployment_condition = "tags.logPullEnabled='true'"
     $script:device_query = "SELECT * FROM devices WHERE $($script:deployment_condition)"
-    $script:function_app_name = "iotedgelogsapp-$($script:env_hash)"
     $script:logs_regex = "\b(WRN?|ERR?|CRIT?)\b"
     $script:logs_since = "15m"
     $script:logs_encoding = "gzip"
@@ -886,6 +909,8 @@ function New-ELMSEnvironment() {
         Write-Host "Custom tags:`r`n$(ConvertTo-Json $script:custom_tags)`r`n"  
     }
      
+    $script:function_app_name = Get-Param -Prompt "Function App name" -DefaultValue "iotedgelogsapp-$($script:env_hash)"
+    $script:function_storage_account_name = Get-Param -Prompt "Function app storage account name" -DefaultValue "iotedgelogsappappst$($script:env_hash)"
 
     if ($deployment_option -eq 1) {
 
@@ -1089,6 +1114,7 @@ function New-ELMSEnvironment() {
         "logicappName"                = @{ "value" = $script:logicapp_name }
         "logicappResourceGroup"       = @{ "value" = $script:logicapp_resource_group }
         "functionAppName"             = @{ "value" = $script:function_app_name }
+        "functionStorageAccountName"  = @{ "value" = $script:function_storage_account_name }
         "httpTriggerFunction"         = @{ "value" = $script:invoke_log_upload_function_name }
         "logsRegex"                   = @{ "value" = $script:logs_regex }
         "logsSince"                   = @{ "value" = $script:logs_since }
@@ -1096,7 +1122,7 @@ function New-ELMSEnvironment() {
         "metricsEncoding"             = @{ "value" = $script:metrics_encoding }
         "templateUrl"                 = @{ "value" = $github_repo_url }
         "branchName"                  = @{ "value" = $(git rev-parse --abbrev-ref HEAD) }
-        "customTags"                              = @{ "value" = $script:custom_tags }
+        "customTags"                  = @{ "value" = $script:custom_tags }
     }
 
     if ($script:create_iot_hub) {
@@ -1296,6 +1322,7 @@ function New-ELMSEnvironment() {
             Write-Host "First function execution submitted successfully"
         }
         else {
+            Write-Host Invoke-WebRequest -Method Post -Uri "https://$($script:function_app_hostname)/api/$($script:invoke_log_upload_function_name)?code=$($script:function_key)" -ErrorAction Ignore
             Start-Sleep -Seconds 10
         }
     } while ($response.StatusCode -ne 200 -and $attemps -gt 0)
