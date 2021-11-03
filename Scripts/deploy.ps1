@@ -1,6 +1,8 @@
 $root_path = Split-Path $PSScriptRoot -Parent
 Import-Module "$root_path/Scripts/PS-Library"
 
+$script:subscriptionid=$(az account list --query "[?isDefault].id | [0]" --only-show-errors)
+
 $github_repo_url = $(git config --get remote.origin.url)
 if ([String]::IsNullOrEmpty($github_repo_url))
 {
@@ -113,6 +115,7 @@ function Set-CustomTags {
     param()
 
     $custom_tags_str = $null
+    $script:custom_tags = $null
 
     while ($null -eq $script:custom_tags)
     {
@@ -213,7 +216,8 @@ function Get-ExistingResource {
                 $resources = az resource list --subscription $newsub --resource-type $type | ConvertFrom-Json | Sort-Object -Property id
             }
             else {
-                return $resources[$option - 1]
+                $resourceitem = $resources[$option - 1]  | Add-Member NoteProperty subscriptionid $newsub
+                return $resourceitem
             }
         }
         else {
@@ -246,13 +250,26 @@ function Get-NewOrExistingResource {
                 $prefix = "a"
             }
 
-            $option = Get-InputSelection `
-                -options $resources.id `
-                -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
-                -separator $separator `
-                -allow_selection_from_other_subscription $true
-
-            return $resources[$option - 1]
+                while($true)
+                {
+                    $option = Get-InputSelection `
+                    -options $resources.id `
+                    -text "Choose $($prefix) $($display_name) to use from this list (using its Index):" `
+                    -separator $separator `
+                    -allow_selection_from_other_subscription $true
+    
+                    $newsub = $script:subscriptionid
+                    if ($option -eq 0)
+                    {
+                        $newsub = Read-Host -Prompt "Enter name or id of subscription >"
+                        $resources = az resource list --subscription $newsub --resource-type $type | ConvertFrom-Json | Sort-Object -Property id
+                    }
+                    else {
+                        $resourceitem = $resources[$option - 1]  
+                        $resourceitem | Add-Member -force NoteProperty subscriptionid $newsub
+                        return $resourceitem
+                    }
+                }
         }
         else {
             return $null
@@ -349,6 +366,7 @@ function Set-LogAnalyticsWorkspace {
         if (!!$workspace) {
             $script:create_workspace = $false
             $script:workspace_name = $workspace.name
+            $script:workspace_subscription = $workspace.subscriptionid
             $script:workspace_resource_group = $workspace.resourceGroup
             $script:workspace_location = $workspace.location
         }
@@ -361,6 +379,7 @@ function Set-LogAnalyticsWorkspace {
     }
 
     if ($script:create_workspace) {
+        $script:workspace_subscription = $script:subscriptionid
         $script:workspace_resource_group = $script:resource_group_name
         $script:workspace_name = "$($prefix)-$($script:env_hash)"
     }
@@ -1063,6 +1082,7 @@ function New-ELMSEnvironment() {
         "createWorkspace"             = @{ "value" = $script:create_workspace }
         "workspaceLocation"           = @{ "value" = $script:workspace_location }
         "workspaceName"               = @{ "value" = $script:workspace_name }
+        "workspaceSubscription"       = @{ "value" = $script:workspace_subscription }
         "workspaceResourceGroup"      = @{ "value" = $script:workspace_resource_group }
         "createLogicApp"              = @{ "value" = $script:create_logicapp }
         "logicappLocation"            = @{ "value" = $script:logicapp_location }

@@ -23,6 +23,13 @@
                 "description": "Resource location for all resources to be created."
             }
         },
+        "logAnalyticsSubscription": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]",
+            "metadata": {
+                "description": "Log analytics subscription"
+            }
+        },
         "logAnalyticsResourceGroup": {
             "type": "string",
             "defaultValue": "[resourceGroup().name]",
@@ -58,8 +65,8 @@
                     "displayName": "azureloganalyticsdatacollector",
                     "parameterValues": {
                     //"username": "[parameters('logAnalyticsWorkspaceId')]",
-                    "username": "[reference(resourceId(parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), '2017-03-15-preview').customerId]",
-                    "password": "[listKeys(resourceId(parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), providers('Microsoft.OperationalInsights', 'workspaces').apiVersions[0]).primarySharedKey]"
+                    "username": "[reference(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), '2017-03-15-preview').customerId]",
+                    "password": "[listKeys(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), providers('Microsoft.OperationalInsights', 'workspaces').apiVersions[0]).primarySharedKey]"
                     }
                 }
             },
