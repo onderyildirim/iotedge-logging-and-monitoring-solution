@@ -550,7 +550,7 @@
     "functionAppResourceId": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
     "functionApiVersion": "2018-11-01",
     "appInsightsName": "[parameters('functionAppName')]",
-    "workspaceId": "[resourceId(parameters('workspaceSubscription'),parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+    "workspaceId": "[resourceId(parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
     "workspaceApiVersion": "[providers('microsoft.operationalinsights', 'workspaces').apiVersions[0]]",
     "workspaceDomainSuffix": "[if(or(startsWith(resourceGroup().location, 'usgov'), startsWith(resourceGroup().location, 'usdod')), 'azure.us', if(contains(resourceGroup().location, 'china'), 'azure.cn', 'azure.com'))]",
     "iotHubDeploymentNames": {
