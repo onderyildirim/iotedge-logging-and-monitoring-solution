@@ -910,7 +910,11 @@ function New-ELMSEnvironment() {
     }
      
     $script:function_app_name = Get-Param -Prompt "Function App name" -DefaultValue "iotedgelogsapp-$($script:env_hash)"
-    $script:function_storage_account_name = Get-Param -Prompt "Function app storage account name" -DefaultValue "iotedgelogsappappst$($script:env_hash)"
+    $script:function_storage_account_name = Get-Param -Prompt "Function app storage account name" -DefaultValue "iotedgelogappst$($script:env_hash)"
+    if($script:function_storage_account_name.Length -gt 24)
+    {
+        $script:function_storage_account_name = $script:function_storage_account_name.Substring(0,24)
+    }
 
     if ($deployment_option -eq 1) {
 
