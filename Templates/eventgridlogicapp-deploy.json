@@ -22,12 +22,6 @@
                 "description": "Resource location for all resources to be created."
             }
         },
-        "environmentHashId": {
-        "type": "string",
-        "metadata": {
-            "description": "Unique alphanumeric id to append to multiple resource names."
-        }
-        },
         "iotHubResourceGroup": {
             "type": "string",
             "defaultValue": "[resourceGroup().name]",
@@ -41,6 +35,18 @@
                 "description": "IoT Hub where status events will be collected."
             }
         },
+        "createIoTHubEventGridSystemTopic": {
+            "type": "bool"
+        },
+        "ioTHubEventGridSystemTopicName": {
+            "type": "string"
+        },
+        "environmentHashId": {
+        "type": "string",
+        "metadata": {
+            "description": "Unique alphanumeric id to append to multiple resource names."
+        }
+        },
         "customTags": {
         "type": "object",
         "defaultValue": {},
@@ -50,12 +56,13 @@
         }        
     },
     "variables": {
-    "systemTopicName": "[concat('statusupdate-', parameters('environmentHashId'))]"
+    "systemTopicName": "[parameters('ioTHubEventGridSystemTopicName')]"
     },
     "resources": [
             {
                 "type": "Microsoft.EventGrid/systemTopics",
                 "apiVersion": "2021-06-01-preview",
+                "condition": "[parameters('createIoTHubEventGridSystemTopic')]",
                 "name": "[variables('systemTopicName')]",
                 "tags": "[parameters('customTags')]",
                 "location": "[parameters('location')]",

@@ -313,22 +313,38 @@ function Set-IoTHub {
 
         if (!!$iot_hub) {
             $script:create_iot_hub = $false
+            $script:iot_hub_id = $iot_hub.id
             $script:iot_hub_name = $iot_hub.name
             $script:iot_hub_resource_group = $iot_hub.resourcegroup
             $script:iot_hub_location = $iot_hub.location
+
+            $system_topics = az eventgrid system-topic list | ConvertFrom-Json
+            $system_topic = $system_topics | Where-Object { $_.source -eq $script:iot_hub_id }
+            if (!!$system_topic) {
+                $script:iothub_event_grid_topic_name = $system_topic.name
+                $script:create_iothub_event_grid_topic = $false
+            }
+            else {
+                $script:create_iothub_event_grid_topic = $true
+            }
         }
         else {
             $script:create_iot_hub = $true
+            $script:create_iothub_event_grid_topic = $true
         }
     }
     else {
         $script:create_iot_hub = $true
+        $script:create_iothub_event_grid_topic = $true
     }
 
     if ($script:create_iot_hub) {
         $script:iot_hub_resource_group = $script:resource_group_name
         $script:iot_hub_name = Get-Param -Prompt "IoT Hub name" -DefaultValue "$($prefix)-$($script:env_hash)"
         $script:iot_hub_policy_name = $policy_name
+    }
+    if ($script:create_iothub_event_grid_topic) {
+        $script:iothub_event_grid_topic_name = Get-Param -Prompt "IoT Hub event grid topic name" -DefaultValue "statusupdate-$($script:env_hash)"
     }
 }
 
@@ -373,7 +389,7 @@ function Set-Storage {
     }
 
     if ($script:create_event_grid) {
-        $script:event_grid_topic_name = Get-Param -Prompt "Storage event grid topic name" -DefaultValue "$($prefix)-$($script:env_hash)"
+        $script:event_grid_topic_name = Get-Param -Prompt "Storage event grid topic name" -DefaultValue "$($prefix)grid-$($script:env_hash)"
     }
 
     $script:storage_container_name = "$($prefix)$($script:env_hash)"
@@ -458,6 +474,7 @@ function Set-LogicAppNamespace {
 
         if (!!$workspace) {
             $script:create_logicapp = $false
+            $script:logicapp_name
             $script:logicapp_name = $logicapp.name
             $script:logicapp_resource_group = $logicapp.resourceGroup
             $script:logicapp_location = $logicapp.location
@@ -955,6 +972,11 @@ function New-ELMSEnvironment() {
             }
             #endregion
 
+            if (!$script:create_iothub_event_grid_topic) {
+                Write-Host
+                Write-Host "The existing event grid system topic '$($script:iothub_event_grid_topic_name)' will be used in the deployment."
+            }
+
             $script:logs_regex = ".*"
             Write-Host
             Write-Host -ForegroundColor Yellow "IMPORTANT: ELMS will be configured to capture all logs from the edge modules. To change this behavior, you can go to the Configuration section of the Function App '$($script:function_app_name)' and update the regular expression for the app setting 'LogsRegex'."
@@ -1100,6 +1122,8 @@ function New-ELMSEnvironment() {
         "iotHubResourceGroup"         = @{ "value" = $script:iot_hub_resource_group }
         "iotHubServicePolicyName"     = @{ "value" = $script:iot_hub_policy_name }
         "deviceQuery"                 = @{ "value" = $script:device_query }
+        "createIotHubEventGridSystemTopic"  = @{ "value" = $script:create_iothub_event_grid_topic }
+        "iotHubEventGridSystemTopicName"    = @{ "value" = $script:iothub_event_grid_topic_name }
         "createStorageAccount"        = @{ "value" = $script:create_storage }
         "storageAccountLocation"      = @{ "value" = $script:storage_account_location }
         "storageAccountName"          = @{ "value" = $script:storage_account_name }

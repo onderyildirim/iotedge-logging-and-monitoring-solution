@@ -92,6 +92,19 @@
         "description": "The Azure IoT Hub default message retention in days."
       }
     },
+    "createIoTHubEventGridSystemTopic": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether to create new system event grid topic for iot hub."
+      }
+    },
+    "ioTHubEventGridSystemTopicName": {
+      "type": "string",
+      "metadata": {
+        "description": "Event grid system topic name for iot hub."
+      }
+    },
     "vnetName": {
       "type": "string",
       "defaultValue": "[concat('iot-vnet-', parameters('environmentHashId'))]",
@@ -1028,6 +1041,12 @@
           },
           "iothubName": {
             "value": "[parameters('iotHubName')]"
+          },
+          "createIoTHubEventGridSystemTopic": {
+            "value": "[parameters('createIoTHubEventGridSystemTopic')]"
+          },
+          "ioTHubEventGridSystemTopicName": {
+            "value": "[parameters('ioTHubEventGridSystemTopicName')]"
           },
           "environmentHashId": {
             "value": "[parameters('environmentHashId')]"
