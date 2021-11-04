@@ -286,7 +286,7 @@ function Get-Param {
         [string] $DefaultValue = ""
     )
     $paramval =  $null
-    if( -not $script:sandbox )
+    if( -not $script:automatic_resource_names )
     {
         $promptstr = "Enter $($Prompt)"
         if (-not [string]::IsNullOrEmpty($DefaultValue))
@@ -900,6 +900,22 @@ function New-ELMSEnvironment() {
         -options $deployment_options `
         -text "Choose a deployment option from the list (using its Index):"
     #endregion
+
+    $script:automatic_resource_names = $true
+    if ($deployment_option -eq 2) {
+        $deployment_options2 = @(
+        "Yes. I would like to set name of each resource separately.",
+        "No, automatically name all resources"
+        )
+
+        $deployment_option2 = Get-InputSelection `
+            -options $deployment_options2 `
+            -text "Would you like to be able to configure names for each resource created?"
+
+        if ($deployment_option -eq 1) {
+            $script:automatic_resource_names = $false
+        }
+    }
 
     #region obtain resource group name
     if ($deployment_option -eq 1 -or $deployment_option -eq 2) {
