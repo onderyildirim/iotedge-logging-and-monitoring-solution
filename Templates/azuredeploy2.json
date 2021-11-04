@@ -563,7 +563,7 @@
     "functionAppResourceId": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
     "functionApiVersion": "2018-11-01",
     "appInsightsName": "[parameters('functionAppName')]",
-    "workspaceId": "[resourceId(parameters('workspaceSubscription'),parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+    //"workspaceId": "[resourceId(parameters('workspaceSubscription'),parameters('workspaceResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
     "workspaceApiVersion": "[providers('microsoft.operationalinsights', 'workspaces').apiVersions[0]]",
     "workspaceDomainSuffix": "[if(or(startsWith(resourceGroup().location, 'usgov'), startsWith(resourceGroup().location, 'usdod')), 'azure.us', if(contains(resourceGroup().location, 'china'), 'azure.cn', 'azure.com'))]",
     "iotHubDeploymentNames": {
@@ -588,7 +588,7 @@
         "elms": "true",
         "iotHub": "[resourceId(parameters('iotHubResourceGroup'), 'Microsoft.Devices/IotHubs', parameters('iotHubName'))]",
         "storageAccount": "[resourceId(parameters('storageAccountResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-        "logAnalyticsWorkspace": "[variables('workspaceId')]",
+        "logAnalyticsWorkspace": "", //"[variables('workspaceId')]",
         "eventHubsInstance": "[if(parameters('createEventHubs'), resourceId(parameters('eventHubResourceGroup'), 'Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubsNamespace'), parameters('eventHubsName')), '')]"
       }
   },
@@ -1241,11 +1241,11 @@
             },
             {
               "name": "WorkspaceId",
-              "value": "[reference(variables('workspaceId'), variables('workspaceApiVersion')).customerId]"
+              "value": "" //"[reference(variables('workspaceId'), variables('workspaceApiVersion')).customerId]"
             },
             {
               "name": "WorkspaceKey",
-              "value": "[listKeys(variables('workspaceId'), variables('workspaceApiVersion')).primarySharedKey]"
+              "value": "" //"[listKeys(variables('workspaceId'), variables('workspaceApiVersion')).primarySharedKey]"
             },
             {
               "name": "WorkspaceDomainSuffix",
@@ -1268,11 +1268,11 @@
     },
     "workspaceId": {
       "type": "string",
-      "value": "[reference(variables('workspaceId'), variables('workspaceApiVersion')).customerId]"
+      "value": "" //"[reference(variables('workspaceId'), variables('workspaceApiVersion')).customerId]"
     },
     "workspaceSharedKey": {
       "type": "string",
-      "value": "[listKeys(variables('workspaceId'), variables('workspaceApiVersion')).primarySharedKey]"
+      "value": "" //"[listKeys(variables('workspaceId'), variables('workspaceApiVersion')).primarySharedKey]"
     },
     "eventHubsNamespaceResourceId": {
       "type": "string",
