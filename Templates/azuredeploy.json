@@ -1111,7 +1111,8 @@
       "location": "[parameters('location')]",
       "kind": "functionapp",
       "dependsOn": [
-        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        //"[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('workspaceId')]",
         "[resourceId('Microsoft.Web/serverfarms', variables('functionAppHostingPlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName'))]",
         "[resourceId('microsoft.insights/components', variables('appInsightsName'))]",
