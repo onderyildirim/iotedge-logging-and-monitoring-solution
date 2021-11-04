@@ -451,11 +451,12 @@ function Set-EventHubsNamespace {
 
         if ($script:create_event_hubs_namespace) {
             $script:event_hubs_resource_group = $script:iot_hub_resource_group
-            $script:event_hubs_namespace = Get-Param -Prompt "Event Hubs name" -DefaultValue "$($prefix)-$($script:env_hash)"
+            $script:event_hubs_namespace = Get-Param -Prompt "Event Hubs namespace name" -DefaultValue "$($prefix)-$($script:env_hash)"
         }
 
         $script:create_event_hubs = $true
-        $script:event_hubs_name = "$($prefix)-$($script:env_hash)"
+        #$script:event_hubs_name = "$($prefix)-$($script:env_hash)"
+        $script:event_hubs_name = Get-Param -Prompt "Event Hubs name" -DefaultValue "$($prefix)-$($script:env_hash)"
         $script:event_hubs_listen_rule = "listen-$($script:env_hash)"
         $script:event_hubs_send_rule = "send-$($script:env_hash)"
         $script:event_hubs_endpoint = "$($prefix)-$($script:env_hash)"
@@ -912,7 +913,7 @@ function New-ELMSEnvironment() {
             -options $deployment_options2 `
             -text "Would you like to be able to configure names for each resource created?"
 
-        if ($deployment_option -eq 1) {
+        if ($deployment_option2 -eq 1) {
             $script:automatic_resource_names = $false
         }
     }

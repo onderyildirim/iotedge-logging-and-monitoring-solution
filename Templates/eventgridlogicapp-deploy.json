@@ -38,7 +38,7 @@
         "createIoTHubEventGridSystemTopic": {
             "type": "bool"
         },
-        "ioTHubEventGridSystemTopicName": {
+        "iotHubEventGridSystemTopicName": {
             "type": "string"
         },
         "environmentHashId": {
@@ -56,7 +56,7 @@
         }        
     },
     "variables": {
-    "systemTopicName": "[parameters('ioTHubEventGridSystemTopicName')]"
+    "systemTopicName": "[parameters('iotHubEventGridSystemTopicName')]"
     },
     "resources": [
             {

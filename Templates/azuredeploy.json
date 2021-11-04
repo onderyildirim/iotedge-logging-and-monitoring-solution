@@ -99,7 +99,7 @@
         "description": "Whether to create new system event grid topic for iot hub."
       }
     },
-    "ioTHubEventGridSystemTopicName": {
+    "iotHubEventGridSystemTopicName": {
       "type": "string",
       "metadata": {
         "description": "Event grid system topic name for iot hub."
@@ -1045,8 +1045,8 @@
           "createIoTHubEventGridSystemTopic": {
             "value": "[parameters('createIoTHubEventGridSystemTopic')]"
           },
-          "ioTHubEventGridSystemTopicName": {
-            "value": "[parameters('ioTHubEventGridSystemTopicName')]"
+          "iotHubEventGridSystemTopicName": {
+            "value": "[parameters('iotHubEventGridSystemTopicName')]"
           },
           "environmentHashId": {
             "value": "[parameters('environmentHashId')]"
