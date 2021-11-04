@@ -65,8 +65,8 @@
                     "displayName": "azureloganalyticsdatacollector",
                     "parameterValues": {
                     //"username": "[parameters('logAnalyticsWorkspaceId')]",
-                    "username": "[reference(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), '2017-03-15-preview').customerId]",
-                    "password": "[listKeys(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), providers('Microsoft.OperationalInsights', 'workspaces').apiVersions[0]).primarySharedKey]"
+                    "username": "", //"[reference(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), '2017-03-15-preview').customerId]",
+                    "password": ""  //"[listKeys(resourceId(parameters('logAnalyticsSubscription'),parameters('logAnalyticsResourceGroup'),'Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), providers('Microsoft.OperationalInsights', 'workspaces').apiVersions[0]).primarySharedKey]"
                     }
                 }
             },

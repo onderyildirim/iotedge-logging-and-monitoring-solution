@@ -962,7 +962,7 @@
       "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('logicappResourceGroup')]",
       "dependsOn": [
-        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('workspaceId')]",
         "[variables('iotHubDeploymentName')]"
       ],
       "properties": {
@@ -1004,7 +1004,7 @@
       "tags": "[parameters('customTags')]",
       "resourceGroup": "[parameters('iotHubResourceGroup')]",
       "dependsOn": [
-        "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+        "[variables('workspaceId')]",
         "[variables('logicAppDeploymentName')]"
       ],
       "properties": {
