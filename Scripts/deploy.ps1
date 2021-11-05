@@ -250,7 +250,8 @@ function Get-NewOrExistingResource {
                 $prefix = "a"
             }
 
-                while($true)
+            $newsub = $script:subscriptionid
+            while($true)
                 {
                     $option = Get-InputSelection `
                     -options $resources.id `
@@ -258,7 +259,6 @@ function Get-NewOrExistingResource {
                     -separator $separator `
                     -allow_selection_from_other_subscription $true
     
-                    $newsub = $script:subscriptionid
                     if ($option -eq 0)
                     {
                         $newsub = Read-Host -Prompt "Enter name or id of subscription >"
@@ -645,7 +645,7 @@ function Set-ELMSAlerts {
         az resource tag `
             --ids $function_app.id `
             --tags elms=true `
-            -i | Out-Null
+            -i # | Out-Null
     }
     #endregion
 
@@ -703,7 +703,7 @@ function Set-ELMSAlerts {
                     Write-Host "Updating function app $($function_app.name)"
                     Write-Host
                     
-                    az functionapp deployment source config-zip -g $function_app.resourceGroup -n $function_app.name --src $script:zip_package_path | Out-Null
+                    az functionapp deployment source config-zip -g $function_app.resourceGroup -n $function_app.name --src $script:zip_package_path # | Out-Null
                     
                     Write-Host
                     Write-Host "Function app updated successfully."
@@ -815,7 +815,7 @@ function Set-ELMSAlerts {
             az functionapp config appsettings set `
                 --resource-group $function_app.resourceGroup `
                 --name $function_app.name `
-                --settings "AzureWebJobs.$($schedule_log_upload_function_name).Disabled=true" | Out-Null
+                --settings "AzureWebJobs.$($schedule_log_upload_function_name).Disabled=true" # | Out-Null
 
             Write-Host
             Write-Host "Function disabled."
@@ -828,7 +828,7 @@ function Set-ELMSAlerts {
             az functionapp config appsettings set `
                 --resource-group $function_app.resourceGroup `
                 --name $function_app.name `
-                --settings "AzureWebJobs.$($schedule_log_upload_function_name).Disabled=false" | Out-Null
+                --settings "AzureWebJobs.$($schedule_log_upload_function_name).Disabled=false" # | Out-Null
 
             Write-Host
             Write-Host "Function disabled."
@@ -1104,7 +1104,7 @@ function New-ELMSEnvironment() {
 
     #region create resource group
     if ($script:create_resource_group) {
-        az group create --name $script:resource_group_name --location $script:iot_hub_location | ConvertFrom-Json | Out-Null
+        az group create --name $script:resource_group_name --location $script:iot_hub_location | ConvertFrom-Json # | Out-Null
         
         Write-Host
         Write-Host "Created new resource group $($script:resource_group_name) in $($script:iot_hub_location)."
@@ -1220,7 +1220,7 @@ function New-ELMSEnvironment() {
     az functionapp config appsettings set `
         --name $script:function_app_name `
         --resource-group $script:resource_group_name `
-        --settings "HostUrl=https://$($script:function_app_hostname)" "HostKey=$($script:function_key)" | Out-Null
+        --settings "HostUrl=https://$($script:function_app_hostname)" "HostKey=$($script:function_key)" # | Out-Null
     #endregion
 
     #region generate monitoring deployment manifest
@@ -1257,7 +1257,7 @@ function New-ELMSEnvironment() {
             -d "main-deployment" `
             --hub-name $script:iot_hub_name `
             --content "$($root_path)/EdgeSolution/deployment.manifest.json" `
-            --target-condition=$script:deployment_condition | Out-Null
+            --target-condition=$script:deployment_condition # | Out-Null
 
         $priority = 0
 
@@ -1274,7 +1274,7 @@ function New-ELMSEnvironment() {
                 --hub-name $script:iot_hub_name `
                 --content $monitoring_manifest `
                 --target-condition=$script:deployment_condition `
-                --priority $priority | Out-Null
+                --priority $priority # | Out-Null
         }
 
         # Create logging deployment
@@ -1289,7 +1289,7 @@ function New-ELMSEnvironment() {
             --hub-name $script:iot_hub_name `
             --content "$($root_path)/EdgeSolution/logging.deployment.json" `
             --target-condition=$script:deployment_condition `
-            --priority $priority | Out-Null
+            --priority $priority # | Out-Null
     }
     #endregion
 
@@ -1297,11 +1297,11 @@ function New-ELMSEnvironment() {
     Write-Host
     Write-Host "Deploying code to Function App $script:function_app_name"
     
-    az functionapp deployment source config-zip -g $script:resource_group_name -n $script:function_app_name --src $script:zip_package_path | Out-Null
+    az functionapp deployment source config-zip -g $script:resource_group_name -n $script:function_app_name --src $script:zip_package_path # | Out-Null
 
     if (!$script:create_event_hubs) {
 
-        az functionapp config appsettings set --resource-group $script:resource_group_name --name $script:function_app_name --settings "AzureWebJobs.CollectMetrics.Disabled=true" | Out-Null
+        az functionapp config appsettings set --resource-group $script:resource_group_name --name $script:function_app_name --settings "AzureWebJobs.CollectMetrics.Disabled=true" # | Out-Null
     }
     #endregion
 
@@ -1324,7 +1324,7 @@ function New-ELMSEnvironment() {
                 --endpoint-name $script:iot_hub_endpoint_name `
                 --endpoint-resource-group $script:resource_group_name `
                 --endpoint-subscription-id $(az account show --query id -o tsv) `
-                --connection-string $eh_conn_string | ConvertFrom-Json | Out-Null
+                --connection-string $eh_conn_string | ConvertFrom-Json # | Out-Null
 
             Write-Host
             Write-Host "Creating IoT hub route"
@@ -1336,7 +1336,7 @@ function New-ELMSEnvironment() {
                 --source-type DeviceMessages `
                 --route-name $script:iot_hub_route_name `
                 --condition $event_hubs_route_condition `
-                --enabled true | ConvertFrom-Json | Out-Null
+                --enabled true | ConvertFrom-Json # | Out-Null
         }
         #endregion
 

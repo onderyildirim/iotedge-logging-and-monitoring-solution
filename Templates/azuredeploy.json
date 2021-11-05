@@ -597,7 +597,7 @@
     "appInsightsTags":{
         "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightsName')))]": "Resource"
       },
-      "functionAppTags": {
+    "functionAppTags": {
         "elms": "true",
         "iotHub": "[resourceId(parameters('iotHubResourceGroup'), 'Microsoft.Devices/IotHubs', parameters('iotHubName'))]",
         "storageAccount": "[resourceId(parameters('storageAccountResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
